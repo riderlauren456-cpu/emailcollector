@@ -177,7 +177,8 @@ app.get('/api/emails', async (req, res) => {
             count: emails.length,
             emails: emails.map(e => ({
                 email: e.email,
-                registeredAt: e.registeredAt
+                registeredAt: e.registeredAt,
+                build: e.build || 'unknown'
             }))
         });
     } catch (error) {

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Collector - Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --c-black: #121212;
+            --c-dark-grey: #1E1E1E;
+            --c-grey: #2D2D2D;
+            --c-light-grey: #8E8E8E;
+            --c-white: #FFFFFF;
+            --c-accent: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--c-black);
+            color: var(--c-white);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--c-grey);
+            padding-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .refresh-btn {
+            background: transparent;
+            border: 1px solid var(--c-light-grey);
+            color: var(--c-white);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            border-color: var(--c-white);
+            background: var(--c-dark-grey);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--c-dark-grey);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid var(--c-grey);
+        }
+
+        th {
+            background-color: var(--c-grey);
+            font-weight: 600;
+            color: var(--c-light-grey);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .timestamp {
+            font-family: monospace;
+            color: var(--c-light-grey);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--c-light-grey);
+        }
+
+        .error {
+            color: #ff6b6b;
+            text-align: center;
+            padding: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Collected Emails</h1>
+            <button id="refreshBtn" class="refresh-btn">Refresh Data</button>
+        </header>
+
+        <div id="tableContainer">
+            <div class="loading">Loading data...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/emails';
+        const tableContainer = document.getElementById('tableContainer');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        async function fetchData() {
+            tableContainer.innerHTML = '<div class="loading">Loading data...</div>';
+
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message || 'Failed to fetch data');
+                }
+
+                renderTable(data.emails);
+            } catch (error) {
+                console.error('Error:', error);
+                tableContainer.innerHTML = `
+                    <div class="error">
+                        <p>Error loading data: ${error.message}</p>
+                        <p>Make sure the backend server consists (port 3000) is running.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderTable(emails) {
+            if (!emails || emails.length === 0) {
+                tableContainer.innerHTML = '<div class="loading">No emails found.</div>';
+                return;
+            }
+
+            // Sort by date desc
+            emails.sort((a, b) => new Date(b.registeredAt) - new Date(a.registeredAt));
+
+            const tableHtml = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Build Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${emails.map(email => {
+                const dateObj = new Date(email.registeredAt);
+                const dateStr = dateObj.toLocaleDateString('tr-TR');
+                const timeStr = dateObj.toLocaleTimeString('tr-TR');
+
+                return `
+                                <tr>
+                                    <td>${email.email}</td>
+                                    <td class="timestamp">${dateStr}</td>
+                                    <td class="timestamp">${timeStr}</td>
+                                    <td><span class="badge">${email.build || '-'}</span></td>
+                                </tr>
+                            `;
+            }).join('')}
+                    </tbody>
+                </table>
+                <p style="margin-top: 1rem; color: var(--c-light-grey); text-align: right; font-size: 0.9rem;">
+                    Total: ${emails.length} records
+                </p>
+            `;
+
+            tableContainer.innerHTML = tableHtml;
+        }
+
+        refreshBtn.addEventListener('click', fetchData);
+
+        // Initial load
+        fetchData();
+    </script>
+</body>
+
+</html>
