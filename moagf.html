@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Listesi - Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --color-bg-primary: #0a0a0f;
+            --color-bg-secondary: #151520;
+            --color-bg-glass: rgba(255, 255, 255, 0.05);
+            --color-border: rgba(255, 255, 255, 0.1);
+            --color-text-primary: #ffffff;
+            --color-text-secondary: rgba(255, 255, 255, 0.7);
+            --color-text-tertiary: rgba(255, 255, 255, 0.5);
+            --color-accent-1: #6366f1;
+            --color-accent-2: #8b5cf6;
+            --gradient-primary: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+            --radius-md: 1rem;
+            --radius-lg: 1.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            padding: var(--spacing-lg);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--color-bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .stats {
+            display: flex;
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-md);
+        }
+
+        .stat {
+            flex: 1;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-accent-1);
+        }
+
+        .stat-label {
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .emails-container {
+            background: var(--color-bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .loading {
+            text-align: center;
+            padding: var(--spacing-lg);
+            color: var(--color-text-secondary);
+        }
+
+        .error {
+            text-align: center;
+            padding: var(--spacing-lg);
+            color: #ef4444;
+        }
+
+        .email-list {
+            list-style: none;
+        }
+
+        .email-item {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .email-item:hover {
+            border-color: var(--color-accent-1);
+            transform: translateX(4px);
+        }
+
+        .email-address {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            font-size: 1.125rem;
+        }
+
+        .email-date {
+            color: var(--color-text-tertiary);
+            font-size: 0.875rem;
+        }
+
+        .refresh-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: var(--spacing-md);
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-lg);
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--color-border);
+            border-top-color: var(--color-accent-1);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                flex-direction: column;
+            }
+
+            .email-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 Email Listesi</h1>
+            <p style="color: var(--color-text-secondary);">Romantik Serseri e-kitabı için kayıt olan kullanıcılar</p>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="totalCount">-</div>
+                    <div class="stat-label">Toplam Kayıt</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="todayCount">-</div>
+                    <div class="stat-label">Bugün</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="emails-container">
+            <div id="emailsContent">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 1rem;">E-postalar yükleniyor...</p>
+                </div>
+            </div>
+            <button class="refresh-btn" onclick="loadEmails()">🔄 Yenile</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+
+        async function loadEmails() {
+            const contentDiv = document.getElementById('emailsContent');
+            contentDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 1rem;">E-postalar yükleniyor...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/emails`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'E-postalar yüklenemedi');
+                }
+
+                displayEmails(data.emails);
+                updateStats(data.emails);
+            } catch (error) {
+                console.error('Error loading emails:', error);
+                contentDiv.innerHTML = `
+                    <div class="error">
+                        <p>❌ E-postalar yüklenirken bir hata oluştu.</p>
+                        <p style="margin-top: 0.5rem; font-size: 0.875rem;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayEmails(emails) {
+            const contentDiv = document.getElementById('emailsContent');
+
+            if (!emails || emails.length === 0) {
+                contentDiv.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <p>Henüz kayıtlı e-posta yok.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by date (newest first)
+            emails.sort((a, b) => new Date(b.registeredAt) - new Date(a.registeredAt));
+
+            const emailList = emails.map(item => {
+                const date = new Date(item.registeredAt);
+                const formattedDate = date.toLocaleString('tr-TR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+                    <li class="email-item">
+                        <div class="email-address">${item.email}</div>
+                        <div class="email-date">${formattedDate}</div>
+                    </li>
+                `;
+            }).join('');
+
+            contentDiv.innerHTML = `<ul class="email-list">${emailList}</ul>`;
+        }
+
+        function updateStats(emails) {
+            const totalCount = document.getElementById('totalCount');
+            const todayCount = document.getElementById('todayCount');
+
+            totalCount.textContent = emails.length;
+
+            // Count today's registrations
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const todayEmails = emails.filter(item => {
+                const emailDate = new Date(item.registeredAt);
+                emailDate.setHours(0, 0, 0, 0);
+                return emailDate.getTime() === today.getTime();
+            });
+
+            todayCount.textContent = todayEmails.length;
+        }
+
+        // Load emails on page load
+        loadEmails();
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadEmails, 30000);
+    </script>
+</body>
+
+</html>
