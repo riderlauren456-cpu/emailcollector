@@ -149,19 +149,9 @@ function hideMessages() {
 
 // Download ebook
 function downloadEbook(token) {
-    // Create a temporary link and trigger download
+    // Open the ebook in a new tab
     const downloadUrl = `${API_BASE_URL}/ebook/${token}`;
-
-    // Use a hidden iframe to trigger the download
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = downloadUrl;
-    document.body.appendChild(iframe);
-
-    // Remove iframe after download starts
-    setTimeout(() => {
-        document.body.removeChild(iframe);
-    }, 2000);
+    window.open(downloadUrl, '_blank');
 }
 
 // Add spinner animation
@@ -181,3 +171,71 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// ========================================
+// VISUAL EFFECTS
+// ========================================
+
+const petalsContainer = document.getElementById('petalsContainer');
+const fireContainer = document.getElementById('fireContainer');
+
+// Petal Generation
+function createPetal() {
+    const petal = document.createElement('div');
+    petal.classList.add('petal');
+
+    // Random Properties
+    const startLeft = Math.random() * 100; // 0-100% width
+    const animationDuration = 5 + Math.random() * 5; // 5-10s
+    const size = 10 + Math.random() * 15; // 10-25px
+    const wind = -50 + Math.random() * 100; // -50px to 50px drift
+
+    petal.style.left = `${startLeft}% `;
+    petal.style.width = `${size} px`;
+    petal.style.height = `${size} px`;
+    petal.style.animation = `fall ${animationDuration}s linear forwards`;
+    petal.style.setProperty('--wind', `${wind} px`);
+
+    petalsContainer.appendChild(petal);
+
+    // Cleanup
+    setTimeout(() => {
+        petal.remove();
+    }, animationDuration * 1000);
+}
+
+// Flame Generation
+function createFlame() {
+    const flame = document.createElement('div');
+    flame.classList.add('flame-particle');
+
+    const startLeft = Math.random() * 100;
+    const animationDuration = 1 + Math.random() * 2; // 1-3s
+    const size = 20 + Math.random() * 40; // 20-60px
+    const drift = -20 + Math.random() * 40;
+
+    flame.style.left = `${startLeft}% `;
+    flame.style.width = `${size} px`;
+    flame.style.height = `${size} px`;
+    flame.style.animation = `rise ${animationDuration}s ease -in forwards`;
+    flame.style.setProperty('--drift', `${drift} px`);
+
+    fireContainer.appendChild(flame);
+
+    setTimeout(() => {
+        flame.remove();
+    }, animationDuration * 1000);
+}
+
+// Start Effects
+if (petalsContainer && fireContainer) {
+    // Generate petals every 300ms
+    setInterval(createPetal, 300);
+
+    // Generate flames every 100ms
+    setInterval(createFlame, 100);
+
+    // Initial burst
+    for (let i = 0; i < 10; i++) createPetal();
+    for (let i = 0; i < 20; i++) createFlame();
+}

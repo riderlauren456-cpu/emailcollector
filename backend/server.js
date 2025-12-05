@@ -154,7 +154,7 @@ app.get('/api/ebook/:token', async (req, res) => {
 
         // Set headers for file download
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename="romantik_serseri.pdf"');
+        res.setHeader('Content-Disposition', 'inline; filename="romantik_serseri.pdf"');
 
         // Send file
         res.sendFile(EBOOK_FILE);

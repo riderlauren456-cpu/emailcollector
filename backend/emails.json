@@ -31,5 +31,10 @@
     "email": "build_test_v1@example.com",
     "registeredAt": "2025-12-05T20:05:08.287Z",
     "build": "1.0.0"
+  },
+  {
+    "email": "header_test@example.com",
+    "registeredAt": "2025-12-05T20:36:36.165Z",
+    "build": "1.0.0"
   }
 ]
