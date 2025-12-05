@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetici Paneli</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 900px;
+            width: 95%;
+            margin: 2rem auto;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary-color);
+            /* Use a distinct color for headers? or just stick to white */
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            opacity: 0.7;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        <h2>Kayıtlı Kullanıcılar</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ad</th>
+                    <th>Soyad</th>
+                    <th>E-posta</th>
+                    <th>Tarih</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <!-- Data rows will be inserted here -->
+            </tbody>
+        </table>
+        <div id="noData" class="no-data" style="display: none;">Kullanıcı bulunamadı.</div>
+    </div>
+
+    <script>
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/api/users');
+                const users = await response.json();
+
+                const tbody = document.getElementById('userTableBody');
+                const noData = document.getElementById('noData');
+
+                tbody.innerHTML = '';
+
+                if (users.length === 0) {
+                    noData.style.display = 'block';
+                    return;
+                }
+
+                users.forEach(user => {
+                    const tr = document.createElement('tr');
+                    const date = new Date(user.timestamp).toLocaleString();
+                    tr.innerHTML = `
+                        <td>${user.firstName}</td>
+                        <td>${user.lastName}</td>
+                        <td>${user.email}</td>
+                        <td>${date}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error('Failed to fetch users', err);
+                alert('Veri yüklenirken hata oluştu.');
+            }
+        }
+
+        fetchUsers();
+    </script>
+</body>
+
+</html>

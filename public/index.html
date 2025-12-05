@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitabınıza Erişin</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Kitabın Kilidini Açın</h1>
+        <p class="subtitle">"Romantik Serseri" kitabına anında erişmek için bilgilerinizi girin.</p>
+
+        <form id="collectorForm">
+            <div class="form-group">
+                <label for="firstName">Ad</label>
+                <input type="text" id="firstName" name="firstName" placeholder="Ahmet" required>
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Soyad</label>
+                <input type="text" id="lastName" name="lastName" placeholder="Yılmaz" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">E-posta Adresi</label>
+                <input type="email" id="email" name="email" placeholder="ahmet@ornek.com" required>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="consent" name="consent" required>
+                <label for="consent">KVKK metnini okudum, onaylıyorum.</label>
+            </div>
+
+            <button type="submit" id="submitBtn">Hemen Eriş</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
