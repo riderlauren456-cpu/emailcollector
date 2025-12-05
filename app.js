@@ -1,5 +1,6 @@
 // Configuration
 const API_BASE_URL = 'http://localhost:3000/api';
+const BUILD_VERSION = '1.0.0';
 
 // DOM Elements
 const emailForm = document.getElementById('emailForm');
@@ -14,14 +15,17 @@ const downloadAgainBtn = document.getElementById('downloadAgainBtn');
 // State
 let currentToken = null;
 
-// Email validation regex
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Email validation regex (Stricter: requires at least 2 char TLD)
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // Form submission handler
 emailForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const email = emailInput.value.trim();
+
+    // Reset previous errors
+    resetErrorState();
 
     // Validate email
     if (!email) {
@@ -30,7 +34,7 @@ emailForm.addEventListener('submit', async (e) => {
     }
 
     if (!emailRegex.test(email)) {
-        showError('Lütfen geçerli bir e-posta adresi girin.');
+        showError('Geçerli bir e-posta adresi giriniz.');
         return;
     }
 
@@ -44,7 +48,10 @@ emailForm.addEventListener('submit', async (e) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email }),
+            body: JSON.stringify({
+                email,
+                build: BUILD_VERSION
+            }),
         });
 
         const data = await response.json();
@@ -68,9 +75,9 @@ emailForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Try again button handler
+// Try again button handler (keeps form visible now)
 tryAgainBtn.addEventListener('click', () => {
-    hideMessages();
+    errorMessage.classList.remove('show');
     emailInput.focus();
 });
 
@@ -96,12 +103,7 @@ function setFormLoading(isLoading) {
         `;
     } else {
         submitBtn.innerHTML = `
-            <span class="btn-text">E-Kitabı İndir</span>
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M7 10l5 5 5-5"></path>
-                <path d="M12 3v12"></path>
-                <path d="M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"></path>
-            </svg>
+            <span class="btn-text">OKUMAYA BAŞLA</span>
         `;
     }
 }
@@ -115,13 +117,30 @@ function showSuccess() {
 
 // Show error message
 function showError(message) {
-    errorText.textContent = message;
-    emailForm.style.display = 'none';
-    successMessage.classList.remove('show');
-    errorMessage.classList.add('show');
+    // Shake the input
+    emailInput.classList.add('shake');
+
+    // Remove shake class after animation lets it play again
+    setTimeout(() => {
+        emailInput.classList.remove('shake');
+    }, 500);
+
+    // Using the button to show temporary error feedback is a nice pattern for minimal forms
+    const originalBtnContent = submitBtn.innerHTML;
+    submitBtn.innerHTML = `<span class="btn-text" style="color: var(--c-white);">${message}</span>`;
+    submitBtn.style.background = 'var(--c-dark-grey)';
+
+    setTimeout(() => {
+        submitBtn.innerHTML = originalBtnContent;
+        submitBtn.style.background = ''; // Reset to default
+    }, 3000);
 }
 
-// Hide all messages
+function resetErrorState() {
+    errorMessage.classList.remove('show');
+}
+
+// Hide all messages (Deprecated but kept for compatibility if called elsewhere)
 function hideMessages() {
     emailForm.style.display = 'block';
     successMessage.classList.remove('show');

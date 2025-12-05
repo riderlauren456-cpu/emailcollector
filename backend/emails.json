@@ -10,5 +10,26 @@
   {
     "email": "met@met.com",
     "registeredAt": "2025-12-05T15:53:10.161Z"
+  },
+  {
+    "email": "redesign_test@example.com",
+    "registeredAt": "2025-12-05T16:41:25.415Z"
+  },
+  {
+    "email": "valid@test.com",
+    "registeredAt": "2025-12-05T19:52:57.443Z"
+  },
+  {
+    "email": "unique_v2@example.com",
+    "registeredAt": "2025-12-05T20:00:25.732Z"
+  },
+  {
+    "email": "jfindikli@gmail.com",
+    "registeredAt": "2025-12-05T20:01:56.130Z"
+  },
+  {
+    "email": "build_test_v1@example.com",
+    "registeredAt": "2025-12-05T20:05:08.287Z",
+    "build": "1.0.0"
   }
 ]

@@ -70,7 +70,7 @@ app.get('/api/health', (req, res) => {
 // Signup endpoint
 app.post('/api/signup', async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email, build } = req.body;
 
         // Validate email
         if (!email) {
@@ -100,7 +100,8 @@ app.post('/api/signup', async (req, res) => {
             // Add new email
             emails.push({
                 email,
-                registeredAt: new Date().toISOString()
+                registeredAt: new Date().toISOString(),
+                build: build || 'unknown'
             });
             await writeEmails(emails);
             console.log(`New email registered: ${email}`);
